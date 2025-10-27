@@ -126,3 +126,23 @@ MEDIA_ROOT = BASE_DIR.parent.parent / 'media'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+AUTH_USER_MODEL = 'users.User'
+
+AUTHENTICATION_BACKENDS = [
+    'apps.users.utils.custom_backend.MultiFieldBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# -------------------------------------------------------------------
+# DJANGO REST FRAMEWORK CONFIG
+# -------------------------------------------------------------------
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'PAGE_SIZE': 20,
+    'EXCEPTION_HANDLER': 'apps.shared.exceptions.handler.custom_exception_handler',
+    'DEFAULT_PAGINATION_CLASS': 'apps.shared.utils.custom_pagination.CustomPageNumberPagination',
+}
