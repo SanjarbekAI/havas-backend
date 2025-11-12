@@ -1,10 +1,10 @@
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView
+from rest_framework.permissions import AllowAny
 
 from apps.products.models import Product
 from apps.products.serializers.product_list_create import ProductCreateSerializer, ProductDetailSerializer, \
     ProductListSerializer
-from apps.shared.permissions.mobile import IsMobileOrWebUser
 from apps.shared.utils.custom_pagination import CustomPageNumberPagination
 from apps.shared.utils.custom_response import CustomResponse
 
@@ -12,7 +12,7 @@ from apps.shared.utils.custom_response import CustomResponse
 class ProductListCreateApiView(ListCreateAPIView):
     serializer_class = ProductCreateSerializer
     pagination_class = CustomPageNumberPagination
-    permission_classes = [IsMobileOrWebUser]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         return Product.objects.filter(is_active=True)
@@ -27,7 +27,6 @@ class ProductListCreateApiView(ListCreateAPIView):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset().order_by('-id'))
-        print(request.lang, request.device_type, "********")
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True, context={'request': request})

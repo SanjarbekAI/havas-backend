@@ -9,8 +9,8 @@ from apps.shared.mixins.translation_mixins import (
 
 class ProductTranslationMixin:
     """Shared configuration for OnBoarding serializers"""
-    translatable_fields = ['title', 'description', 'images']
-    media_fields = ['images']
+    translatable_fields = ['title', 'description']
+    media_fields = ['image']
 
 
 class ProductCreateSerializer(ProductTranslationMixin, TranslatedFieldsWriteMixin, serializers.ModelSerializer):
@@ -18,12 +18,6 @@ class ProductCreateSerializer(ProductTranslationMixin, TranslatedFieldsWriteMixi
         model = Product
         fields = ['title', 'description', 'price', 'measurement_type',
                   'is_active', 'category', 'discount']
-
-    # def create(self, validated_data):
-    #     request = self.context.get('request')
-    #     if request and hasattr(request, 'user'):
-    #         validated_data['created_by'] = request.user
-    #     return super().create(validated_data)
 
 
 class ProductListSerializer(serializers.ModelSerializer):

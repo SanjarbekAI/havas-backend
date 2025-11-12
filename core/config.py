@@ -20,14 +20,14 @@ else:
     print("⚠️  Warning: .env file not found!")
 
 # DJANGO CORE SETTINGS
-SECRET_KEY = env('SECRET_KEY', default='unsafe-secret-key')
+SECRET_KEY = env('DJANGO_SECRET_KEY', default='unsafe-secret-key')
 DEBUG = env.bool('DEBUG', default=False)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 # DATABASE SETTINGS
 DB_NAME = env('DB_NAME')
 DB_USER = env('DB_USER')
-DB_PASSWORD = env('DB_PASSWORD')
+DB_PASS = env('DB_PASS')
 DB_HOST = env('DB_HOST')
 DB_PORT = env('DB_PORT')
 
