@@ -1,7 +1,7 @@
 ---
 name: Checks
 
-on: [push]
+on: [ push ]
 
 jobs:
   test-lint:
@@ -17,3 +17,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Test
         run: docker compose run --rm app sh -c "python manage.py test"
+        env:
+          DB_HOST: db
+          DB_NAME: testdb
+          DB_USER: testuser
+          DB_PASS: testpass
+          DB_PORT: 5432
+          DEBUG: 1
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
