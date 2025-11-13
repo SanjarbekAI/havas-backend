@@ -1,74 +1,74 @@
-name: Deploy to Production
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  test:
-    name: Run Tests
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run tests
-        run: docker compose run --rm app sh -c "python manage.py test"
-        env:
-          DB_HOST: db
-          DB_NAME: testdb
-          DB_USER: testuser
-          DB_PASS: testpass
-          DB_PORT: 5432
-          SECRET_KEY: test-secret-key-min-50-chars-long-for-testing-purposes
-          ALLOWED_HOSTS: localhost,127.0.0.1
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
-          DEBUG: 1
-
-  build-and-push:
-    name: Build and Push to Docker Hub
-    needs: test
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push app image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USER }}/havas-backend:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USER }}/havas-backend:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USER }}/havas-backend:buildcache,mode=max
-
-      - name: Build and push proxy image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./proxy
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USER }}/havas-backend-proxy:latest
-
-  deploy:
-    name: Deploy to Digital Ocean
-    needs: build-and-push
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Deploy to server
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            /home/${{ secrets.SERVER_USER }}/deploy.sh
+#name: Deploy to Production
+#
+#on:
+#  push:
+#    branches: [ main ]
+#
+#jobs:
+#  test:
+#    name: Run Tests
+#    runs-on: ubuntu-22.04
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Run tests
+#        run: docker compose run --rm app sh -c "python manage.py test"
+#        env:
+#          DB_HOST: db
+#          DB_NAME: testdb
+#          DB_USER: testuser
+#          DB_PASS: testpass
+#          DB_PORT: 5432
+#          SECRET_KEY: test-secret-key-min-50-chars-long-for-testing-purposes
+#          ALLOWED_HOSTS: localhost,127.0.0.1
+#          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+#          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+#          DEBUG: 1
+#
+#  build-and-push:
+#    name: Build and Push to Docker Hub
+#    needs: test
+#    runs-on: ubuntu-22.04
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v3
+#
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USER }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#
+#      - name: Build and push app image
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: .
+#          push: true
+#          tags: ${{ secrets.DOCKERHUB_USER }}/havas-backend:latest
+#          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USER }}/havas-backend:buildcache
+#          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USER }}/havas-backend:buildcache,mode=max
+#
+#      - name: Build and push proxy image
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: ./proxy
+#          push: true
+#          tags: ${{ secrets.DOCKERHUB_USER }}/havas-backend-proxy:latest
+#
+#  deploy:
+#    name: Deploy to Digital Ocean
+#    needs: build-and-push
+#    runs-on: ubuntu-22.04
+#    steps:
+#      - name: Deploy to server
+#        uses: appleboy/ssh-action@v1.0.0
+#        with:
+#          host: ${{ secrets.SERVER_HOST }}
+#          username: ${{ secrets.SERVER_USER }}
+#          key: ${{ secrets.SSH_PRIVATE_KEY }}
+#          script: |
+#            /home/${{ secrets.SERVER_USER }}/deploy.sh
