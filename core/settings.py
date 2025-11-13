@@ -204,6 +204,6 @@ SIMPLE_JWT = {
 
     'JTI_CLAIM': 'jti',  # Unique token identifier
 
-    # Token payload customization # test
+    # Token payload customization
     'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
 }
