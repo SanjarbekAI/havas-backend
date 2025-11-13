@@ -1,13 +1,13 @@
 server {
-    listen 80;
+    listen ${LISTEN_PORT};
     server_name ezma.uz www.ezma.uz 164.90.186.197;
 
     location /static/ {
-        alias /vol/web/static/;
+        alias /vol/static/;
     }
 
     location /media/ {
-        alias /vol/web/media/;
+        alias /vol/static/media/;
     }
 
     location /health/ {
