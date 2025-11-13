@@ -4,13 +4,21 @@ services:
   app:
     build:
       context: .
+    image: ${DOCKER_HUB_USER}/havas-backend:latest
     restart: always
     volumes:
       - static-data:/vol/web
     env_file:
       - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "python -c 'import requests; requests.get(\"http://localhost:9000\", timeout=2)'" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   db:
     image: postgres:16-alpine
@@ -21,18 +29,30 @@ services:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   proxy:
     build:
       context: ./proxy
+    image: ${DOCKER_HUB_USER}/your-app-name-proxy:latest
     restart: always
     depends_on:
-      - app
+      app:
+        condition: service_healthy
     ports:
-      - "80:80"
+      - "80:8000"
       - "443:443"
     volumes:
       - static-data:/vol/static
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8000/health/ || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   postgres-data:
