@@ -38,7 +38,7 @@ services:
   proxy:
     build:
       context: ./proxy
-    image: ${DOCKER_HUB_USER}/your-app-name-proxy:latest
+    image: ${DOCKER_HUB_USER}/havas-backend-proxy:latest
     restart: always
     depends_on:
       app:
